@@ -1,0 +1,58 @@
+server:
+  port: 8090
+
+spring:
+  application:
+    name: workload-service
+
+  datasource:
+    url: jdbc:h2:mem:workloadDB
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+
+  h2:
+    console:
+      enabled: true
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:host.docker.internal:9092}
+    consumer:
+      group-id: workload-service
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.value.default.type: com.epam.contracts.events.TrainingEvent
+        spring.json.trusted.packages: "com.epam.contracts.events"
+      auto-offset-reset: earliest
+      listener:
+        ack-mode: RECORD
+
+app:
+  topics:
+    training: trainer-training-events
+    training-dlq: trainer-training-events.DLQ
+
+eureka:
+  client:
+    service-url:
+      default-zone: http://localhost:8761/eureka
+  instance:
+    prefer-ip-address: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+
+logging:
+  pattern:
+    level: "%5p [%X{txId:-no-tx}]"
