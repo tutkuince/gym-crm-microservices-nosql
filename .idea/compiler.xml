@@ -15,6 +15,7 @@
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="contracts" target="21" />
+      <module name="gym-crm-microservices-kafka" target="1.5" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
