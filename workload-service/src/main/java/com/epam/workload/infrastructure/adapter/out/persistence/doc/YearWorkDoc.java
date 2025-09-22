@@ -1,9 +1,6 @@
 package com.epam.workload.infrastructure.adapter.out.persistence.doc;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,4 +12,9 @@ import java.util.List;
 public class YearWorkDoc {
     private int year;
     private List<MonthWorkDoc> months = new ArrayList<>();
+
+    @Builder
+    public YearWorkDoc(int year) {
+        this.year = year;
+    }
 }

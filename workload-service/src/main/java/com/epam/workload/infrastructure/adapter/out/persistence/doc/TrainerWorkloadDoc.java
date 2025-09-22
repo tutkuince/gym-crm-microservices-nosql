@@ -1,10 +1,7 @@
 package com.epam.workload.infrastructure.adapter.out.persistence.doc;
 
 import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -30,4 +27,12 @@ public class TrainerWorkloadDoc {
 
     private List<YearWorkDoc> years = new ArrayList<>();
     private Instant updatedAt;
+
+    @Builder
+    public TrainerWorkloadDoc(String username, String firstName, String lastName, boolean active) {
+        this.username = username;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.active = active;
+    }
 }
