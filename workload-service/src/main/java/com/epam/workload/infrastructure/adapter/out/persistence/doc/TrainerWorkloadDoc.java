@@ -23,13 +23,13 @@ public class TrainerWorkloadDoc {
     private String username;     // _id = username
     private String firstName;
     private String lastName;
-    private boolean active;
+    private Boolean active;
 
     private List<YearWorkDoc> years = new ArrayList<>();
     private Instant updatedAt;
 
     @Builder
-    public TrainerWorkloadDoc(String username, String firstName, String lastName, boolean active) {
+    public TrainerWorkloadDoc(String username, String firstName, String lastName, Boolean active) {
         this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
