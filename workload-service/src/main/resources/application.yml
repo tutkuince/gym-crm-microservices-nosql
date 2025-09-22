@@ -5,11 +5,10 @@ spring:
   application:
     name: workload-service
 
-  datasource:
-    url: jdbc:h2:mem:workloadDB
-    driver-class-name: org.h2.Driver
-    username: sa
-    password:
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/gym
+      auto-index-creation: true
 
   jpa:
     hibernate:
