@@ -52,7 +52,7 @@ public class TrainerWorkloadMapper {
                 new TrainerId(doc.getUsername()),
                 doc.getFirstName(),
                 doc.getLastName(),
-                doc.isActive()
+                doc.getActive()
         );
 
         List<YearWorkDoc> years = doc.getYears();
