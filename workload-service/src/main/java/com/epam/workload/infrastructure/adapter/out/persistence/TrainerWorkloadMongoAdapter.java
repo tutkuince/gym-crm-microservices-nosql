@@ -13,14 +13,13 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
-import java.time.YearMonth;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
 @Component
-public class TrainerWorkloadMongoAdapter implements UpsertWorkloadPort, LoadWorkloadPort, SaveWorkloadPort {
+public class TrainerWorkloadMongoAdapter implements LoadWorkloadPort, SaveWorkloadPort {
 
     private final MongoTemplate mongo;
 
@@ -53,68 +52,25 @@ public class TrainerWorkloadMongoAdapter implements UpsertWorkloadPort, LoadWork
     }
 
     @Override
-    public void upsertMinutes(String username,
-                              String firstName,
-                              String lastName,
-                              boolean active,
-                              YearMonth ym,
-                              int deltaMinutes) {
-
-        // _id = username
-        Query byUser = Query.query(Criteria.where("_id").is(username));
-
-        Update base = new Update()
-                .setOnInsert("_id", username)
-                .setOnInsert("firstName", firstName)
-                .setOnInsert("lastName", lastName)
-                .setOnInsert("active", active);
-
-        // 2) (idempotent: addToSet)
-        Update addYear = base.addToSet("years").each(List.of(Map.of(
-                "year", ym.getYear(),
-                "months", List.of()
-        )));
-        mongo.upsert(byUser, addYear, TrainerWorkloadDoc.class);
-
-        // 3) O yıl içinde ilgili ay yoksa ekle
-        Update addMonth = new Update()
-                .addToSet("years.$[y].months").each(
-                        List.of(Map.of("month", ym.getMonthValue(), "totalMinutes", 0))
-                )
-                .filterArray(Criteria.where("y.year").is(ym.getYear()));
-        mongo.updateFirst(byUser, addMonth, "trainer_workloads");
-
-        // 4) Dakikayı artır + updatedAt
-        Update inc = new Update()
-                .inc("years.$[y].months.$[m].totalMinutes", deltaMinutes)
-                .set("updatedAt", Instant.now())
-                .filterArray(Criteria.where("y.year").is(ym.getYear()))
-                .filterArray(Criteria.where("m.month").is(ym.getMonthValue()));
-        mongo.updateFirst(byUser, inc, "trainer_workloads");
-    }
-
-    @Override
     public void upsertMonth(String username, int year, int month,
                             String firstName, String lastName, boolean active,
                             int totalMinutes) {
 
         Query byUser = Query.query(Criteria.where("_id").is(username));
 
-        // Belge yoksa temel alanlar
+        // If document does not exist, set basic fields on insert
         Update base = new Update()
                 .setOnInsert("_id", username)
                 .setOnInsert("firstName", firstName)
                 .setOnInsert("lastName", lastName)
                 .setOnInsert("active", active);
 
-        // Yıl yoksa ekle (idempotent)
-        Update addYear = base.addToSet("years").each(List.of(Map.of(
-                "year", year,
-                "months", List.of()
-        )));
+        // Add the year entry if it does not exist (idempotent)
+        Update addYear = base.addToSet("years")
+                .each(List.of(Map.of("year", year)));
         mongo.upsert(byUser, addYear, TrainerWorkloadDoc.class);
 
-        // Ay yoksa ekle (idempotent)
+        // Add the month entry inside the given year if it does not exist (idempotent)
         Update addMonth = new Update()
                 .addToSet("years.$[y].months").each(
                         List.of(Map.of("month", month, "totalMinutes", 0))
@@ -122,7 +78,7 @@ public class TrainerWorkloadMongoAdapter implements UpsertWorkloadPort, LoadWork
                 .filterArray(Criteria.where("y.year").is(year));
         mongo.updateFirst(byUser, addMonth, "trainer_workloads");
 
-        // Toplamı set et + updatedAt
+        // Finally, set the totalMinutes value and update the timestamp
         Update setTotal = new Update()
                 .set("years.$[y].months.$[m].totalMinutes", totalMinutes)
                 .set("updatedAt", Instant.now())
@@ -131,24 +87,31 @@ public class TrainerWorkloadMongoAdapter implements UpsertWorkloadPort, LoadWork
         mongo.updateFirst(byUser, setTotal, "trainer_workloads");
     }
 
+
     @Override
     public void deleteMonth(String username, int year, int month) {
         Query byUser = Query.query(Criteria.where("_id").is(username));
 
-        // Ayı months'tan çıkar
+        // 1) Remove the month object from the matching year's months array (idempotent if not present)
         Update pullMonth = new Update()
                 .pull("years.$[y].months",
                         Query.query(Criteria.where("month").is(month)).getQueryObject())
+                .currentDate("updatedAt") // keep audit timestamp fresh
                 .filterArray(Criteria.where("y.year").is(year));
         mongo.updateFirst(byUser, pullMonth, "trainer_workloads");
 
-        // Ay kalmadıysa yılı da çıkar (opsiyonel ama temiz)
+        // 2) If the year has no months left, remove the entire year entry
+        //    Also handle the rare case where "months" might be absent (exists:false).
         Update pullEmptyYear = new Update()
-                .pull("years",
-                        Query.query(Criteria.where("year").is(year)
-                                .and("months").size(0)).getQueryObject());
+                .pull("years", Query.query(new Criteria().andOperator(
+                        Criteria.where("year").is(year),
+                        new Criteria().orOperator(
+                                Criteria.where("months").size(0),
+                                Criteria.where("months").exists(false)
+                        )
+                )).getQueryObject())
+                .currentDate("updatedAt");
         mongo.updateFirst(byUser, pullEmptyYear, "trainer_workloads");
     }
-
 
 }

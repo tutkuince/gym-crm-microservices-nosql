@@ -121,6 +121,35 @@ services:
       - KAFKA_CFG_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1
       - KAFKA_CFG_TRANSACTION_STATE_LOG_MIN_ISR=1
 
+  mongo:
+    image: mongo:7
+    container_name: gym_crm_mongo
+    environment:
+      MONGO_INITDB_DATABASE: gym
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo:/data/db
+    networks:
+      - backend
+    restart: unless-stopped
+
+  mongo-express:
+    image: mongo-express:latest
+    container_name: gym_crm_mongo_express
+    environment:
+      ME_CONFIG_MONGODB_SERVER: mongo
+      ME_CONFIG_MONGODB_PORT: 27017
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: admin
+    ports:
+      - "8081:8081"
+    depends_on:
+      - mongo
+    networks:
+      - backend
+    restart: unless-stopped
+
 networks:
   backend:
     driver: bridge
@@ -132,3 +161,4 @@ volumes:
   postgres-stg:
   pgadmin:
   grafana-storage:
+  mongo:

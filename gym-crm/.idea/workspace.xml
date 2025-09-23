@@ -61,6 +61,9 @@
     "Application.GymCrmApplication.executor": "Debug",
     "Docker.docker-compose.yml.postgres: Compose Deployment.executor": "Run",
     "Docker.docker-compose.yml: Compose Deployment.executor": "Run",
+    "Docker.docker.kafka: Compose Deployment.executor": "Run",
+    "Docker.docker.mongo: Compose Deployment.executor": "Run",
+    "Docker.docker: Compose Deployment.executor": "Run",
     "Docker.infrastructure: Compose Deployment.executor": "Run",
     "JUnit.All in gym-crm.executor": "Coverage",
     "JUnit.ApplicationCoreHealthIndicatorTest.executor": "Run",
@@ -193,51 +196,6 @@
     </key>
   </component>
   <component name="RunManager" selected="Spring Boot.GymCrmApplication">
-    <configuration name="BruteForceServiceTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="gym-crm" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="com.epam.gymcrm.infrastructure.security.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="com.epam.gymcrm.infrastructure.security" />
-      <option name="MAIN_CLASS_NAME" value="com.epam.gymcrm.infrastructure.security.BruteForceServiceTest" />
-      <option name="TEST_OBJECT" value="class" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="CustomUserDetailsServiceTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="gym-crm" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="com.epam.gymcrm.infrastructure.security.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="com.epam.gymcrm.infrastructure.security" />
-      <option name="MAIN_CLASS_NAME" value="com.epam.gymcrm.infrastructure.security.CustomUserDetailsServiceTest" />
-      <option name="TEST_OBJECT" value="class" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="TokenBlacklistTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="gym-crm" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="com.epam.gymcrm.infrastructure.security.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="com.epam.gymcrm.infrastructure.security" />
-      <option name="MAIN_CLASS_NAME" value="com.epam.gymcrm.infrastructure.security.TokenBlacklistTest" />
-      <option name="TEST_OBJECT" value="class" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
     <configuration name="UserAccountServiceTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="gym-crm" />
       <extension name="coverage">
@@ -274,13 +232,47 @@
       </deployment>
       <method v="2" />
     </configuration>
+    <configuration name="docker: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
+      <deployment type="docker-compose.yml">
+        <settings>
+          <option name="sourceFilePath" value="docker/docker-compose.yml" />
+        </settings>
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <configuration name="docker.kafka: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
+      <deployment type="docker-compose.yml">
+        <settings>
+          <option name="services">
+            <list>
+              <option value="kafka" />
+            </list>
+          </option>
+          <option name="sourceFilePath" value="docker/docker-compose.yml" />
+        </settings>
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <configuration name="docker.mongo: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
+      <deployment type="docker-compose.yml">
+        <settings>
+          <option name="services">
+            <list>
+              <option value="mongo" />
+            </list>
+          </option>
+          <option name="sourceFilePath" value="docker/docker-compose.yml" />
+        </settings>
+      </deployment>
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Docker.docker: Compose Deployment" />
+        <item itemvalue="Docker.docker.mongo: Compose Deployment" />
+        <item itemvalue="Docker.docker.kafka: Compose Deployment" />
         <item itemvalue="JUnit.java in gym-crm" />
         <item itemvalue="JUnit.UserAccountServiceTest" />
-        <item itemvalue="JUnit.TokenBlacklistTest" />
-        <item itemvalue="JUnit.CustomUserDetailsServiceTest" />
-        <item itemvalue="JUnit.BruteForceServiceTest" />
       </list>
     </recent_temporary>
   </component>
@@ -358,7 +350,7 @@
       <workItem from="1755698869740" duration="3333000" />
       <workItem from="1756319385382" duration="20000" />
       <workItem from="1756822121901" duration="12000" />
-      <workItem from="1758569341544" duration="733000" />
+      <workItem from="1758569341544" duration="3752000" />
     </task>
     <task id="LOCAL-00053" summary="refactor: Update Training controller, service, tests, and specification for relationship handling">
       <option name="closed" value="true" />
